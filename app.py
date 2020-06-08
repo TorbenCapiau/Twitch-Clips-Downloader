@@ -11,11 +11,15 @@ def GetCuratorId(username, auth):
 def DownloadClip(clip, filename):
     filename = "{}.mp4".format(slugify(filename))
     if "AT-cm" not in clip['node']['thumbnailURL']:
-        video_id = clip['node']['thumbnailURL'].split('/')[3].split('-')[0]
-        offset = clip['node']['thumbnailURL'].split('/')[3].split('-')[2]
-        clip_url = "https://{}/{}-offset-{}.mp4".format(clip['node']['thumbnailURL'].split('/')[2], str(video_id), str(offset))
+        if "offset" in clip['node']['thumbnailURL']:
+            video_id = clip['node']['thumbnailURL'].split('/')[3].split('-')[0]
+            offset = clip['node']['thumbnailURL'].split('/')[3].split('-')[2]
+            clip_url = "https://{}/{}-offset-{}.mp4".format(clip['node']['thumbnailURL'].split('/')[2], str(video_id), str(offset))
+        else:
+            clip_url = "https://{}/{}.mp4".format(clip['node']['thumbnailURL'].split('/')[2], clip['node']['thumbnailURL'].split('/')[3].split('-')[0])
     else:
-        clip_url = "https://{}/AT-{}.mp4".format(clip['node']['thumbnailURL'].split('/')[2], clip['node']['thumbnailURL'].split('/')[3].split('-')[1])
+        if "AT-cm" in clip['node']['thumbnailURL']:
+            clip_url = "https://{}/AT-{}.mp4".format(clip['node']['thumbnailURL'].split('/')[2], clip['node']['thumbnailURL'].split('/')[3].split('-')[1])
     r = requests.get(clip_url)
     with open("{}/{}".format(download_path, filename), 'wb') as f:
         f.write(r.content)
