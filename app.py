@@ -15,6 +15,15 @@ def AlreadyDownloaded(slug):
             return True
     return False
 
+def GetClipUrl(slug):
+    data = [{"operationName":"VideoAccessToken_Clip","variables":{"slug":slug},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"9bfcc0177bffc730bd5a5a89005869d2773480cf1738c592143b5173634b7d15"}}}]
+    r = requests.post("https://gql.twitch.tv/gql", headers={"Client-Id": "kimne78kx3ncx6brgo4mv6wki5h1ko"}, json=data)
+    try:
+        return r.json()[0]['data']['clip']['videoQualities'][0]['sourceURL']
+    except:
+        print("[ERROR] Could not fetch clip URL")
+        return None
+
 def GetCuratorId(username, auth):
     data = [{"operationName":"ClipsManagerTable_User","variables":{"login":username,"limit":20,"criteria":{"sort":"CREATED_AT_DESC","period":"ALL_TIME","curatorID":"0"},"cursor":None},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"b300f79444fdcf2a1a76c101f466c8c9d7bee49b643a4d7878310a4e03944232"}}}]
     r = requests.post("https://gql.twitch.tv/gql", headers={"Authorization": "OAuth {}".format(auth), "Client-Id": "kimne78kx3ncx6brgo4mv6wki5h1ko"}, json=data)
@@ -23,29 +32,12 @@ def GetCuratorId(username, auth):
 def DownloadClip(clip, filename, i):
     if not AlreadyDownloaded(clip['node']['slug']):
         filename = "{}-{}.mp4".format(str(i), slugify(filename))
-        if "AT-cm" not in clip['node']['thumbnailURL']:
-            if "offset" in clip['node']['thumbnailURL'] or "index" in clip['node']['thumbnailURL']:
-                video_id = clip['node']['thumbnailURL'].split('/')[3].split('-')[0]
-                offset = clip['node']['thumbnailURL'].split('/')[3].split('-')[2]
-                if len(clip['node']['thumbnailURL'].split('/')[3].split('-')) > 5:
-                    if "vod" in clip['node']['thumbnailURL'].split('/')[3]:
-                        clip_url = "https://{}/vod-{}-offset-{}.mp4".format(clip['node']['thumbnailURL'].split('/')[2], clip['node']['thumbnailURL'].split('/')[3].split('-')[1], clip['node']['thumbnailURL'].split('/')[3].split('-')[3])
-                    else:
-                        clip_url = "https://{}/{}-offset-{}-{}.mp4".format(clip['node']['thumbnailURL'].split('/')[2], str(video_id), clip['node']['thumbnailURL'].split('/')[3].split('-')[2], clip['node']['thumbnailURL'].split('/')[3].split('-')[3])
-                else:
-                    clip_url = "https://{}/{}-offset-{}.mp4".format(clip['node']['thumbnailURL'].split('/')[2], str(video_id), str(offset))
-            else:
-                clip_url = "https://{}/{}.mp4".format(clip['node']['thumbnailURL'].split('/')[2], clip['node']['thumbnailURL'].split('/')[3].split('-')[0])
-        else:
-            if "AT-cm" in clip['node']['thumbnailURL']:
-                clip_url = "https://{}/AT-{}.mp4".format(clip['node']['thumbnailURL'].split('/')[2], clip['node']['thumbnailURL'].split('/')[3].split('-')[1])
-        if "-index-" in clip['node']['thumbnailURL']:
-            clip_url = clip_url.replace("-offset-", "-index-")
-        r = requests.get(clip_url)
-        with open("{}/{}".format(download_path, filename), 'wb') as f:
-            f.write(r.content)
-        MarkDone(clip['node']['slug'])
-        print("[SUCCESS] Saved as {}".format(filename))
+        clip_url = GetClipUrl(clip['node']['slug'])
+        if clip_url != None:
+            r = requests.get(clip_url)
+            with open("{}/{}".format(download_path, filename), 'wb') as f:
+                f.write(r.content)
+            print("[SUCCESS] Saved as {}".format(filename))
     else:
         print("[SKIPPED] Already downloaded this file ({})".format(filename))
 
