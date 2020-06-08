@@ -19,6 +19,8 @@ Many streamers have received copyright complaints over their Twitch clips and ar
 
 ## Installation & usage
 ```bash
+git clone https://github.com/TorbenCapiau/Twitch-Clips-Downloader.git
+cd Twitch-Clips-Downloader
 pip install -r requirements.txt
 python app.py --username <Twitch username> --auth <auth-token value>
 ```

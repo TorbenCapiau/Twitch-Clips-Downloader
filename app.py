@@ -1,7 +1,7 @@
 import requests, argparse, base64, os, unicodedata
 from slugify import slugify
 
-download_path = "./downloads"
+download_path = "./test"
 
 def GetCuratorId(username, auth):
     data = [{"operationName":"ClipsManagerTable_User","variables":{"login":username,"limit":20,"criteria":{"sort":"CREATED_AT_DESC","period":"ALL_TIME","curatorID":"0"},"cursor":None},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"b300f79444fdcf2a1a76c101f466c8c9d7bee49b643a4d7878310a4e03944232"}}}]
@@ -41,9 +41,9 @@ Twitch_Auth = args.Auth
 # Create downloads directory
 try:
     os.mkdir(download_path)
-    print("Directory " , download_path ,  " Created ") 
+    print("[SUCCESS] Directory " , download_path ,  " Created ") 
 except FileExistsError:
-    print("Directory " , download_path ,  " already exists")
+    print("[INFO] Directory " , download_path ,  " already exists")
 
 doneParsing = False
 curatorId = GetCuratorId(Twitch_Username, Twitch_Auth)
