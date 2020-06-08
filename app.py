@@ -71,8 +71,13 @@ while not doneParsing:
     data = [{"operationName":"ClipsManagerTable_User","variables":{"login":Twitch_Username,"limit":limit_increase,"criteria":{"sort":"CREATED_AT_DESC","period":"ALL_TIME","curatorID":curatorId},"cursor":str(cursor)},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"b300f79444fdcf2a1a76c101f466c8c9d7bee49b643a4d7878310a4e03944232"}}}]
     for clip in clips:
         i = i + 1
-        print("[INFO] Found clip: {} on {} ({})".format(clip['node']['title'], clip['node']['broadcaster']['displayName'], clip['node']['url']))
-        DownloadClip(clip, "{} - {} - {}".format(clip['node']['createdAt'].split('T')[0], clip['node']['broadcaster']['displayName'], clip['node']['title']), i)
+        channelName = "channel"
+        try:
+            channelName = clip['node']['broadcaster']['displayName']
+        except:
+            pass
+        print("[INFO] Found clip: {} on {} ({})".format(clip['node']['title'], channelName, clip['node']['url']))
+        DownloadClip(clip, "{} - {} - {}".format(clip['node']['createdAt'].split('T')[0], channelName, clip['node']['title']), i)
     if not r.json()[0]['data']['user']['clips']['pageInfo']['hasNextPage']:
         doneParsing = True
         print("[SUCCESS] Done. Fetched {} clips".format(currentCount))
