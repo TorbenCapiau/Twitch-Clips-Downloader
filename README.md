@@ -31,5 +31,5 @@ python app.py <Twitch username> <auth-token value>
 # Download ALL clips of a channel
 python topclips.py <ChannelName>
 # Download 5 clips of a channel
-python topclips.py <ChannelName> 5
+python topclips.py <ChannelName> --limit 5
 ```

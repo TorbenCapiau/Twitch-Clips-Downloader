@@ -31,14 +31,16 @@ my_parser = argparse.ArgumentParser(description='Downloads your Twitch clips')
 
 # Add the arguments
 my_parser.add_argument('Username', metavar='username', type=str, help='Twitch channel you want to download clips from')
-my_parser.add_argument('Limit', metavar='limit', type=int, help='Limit the amount of clips', default = None)
+my_parser.add_argument('--limit', required=False)
 
 # Execute the parse_args() method
 args = my_parser.parse_args()
 
 Twitch_Username = args.Username
-Clips_Limit = args.Limit
-
+if args.limit != None:
+    Clips_Limit = int(args.limit)
+else:
+    Clips_Limit = None
 try:
     os.mkdir("./top-clips")
     print("[SUCCESS] Directory top-clips Created ") 
@@ -60,11 +62,15 @@ while not doneParsing:
     nextPage = r.json()[0]['data']['user']['clips']['pageInfo']['hasNextPage']
     clips = r.json()[0]['data']['user']['clips']['edges']
     for clip in clips:
-        if i <= Clips_Limit:
+        if Clips_Limit != None:
+            if i <= Clips_Limit:
+                DownloadClip("./top-clips/{}".format(Twitch_Username), clip, "{} - {} - {}".format(str(clip['node']['viewCount']), clip['node']['createdAt'].split('T')[0], clip['node']['title']), i)
+                i = i + 1
+            else:
+                doneParsing = True
+        else:
             DownloadClip("./top-clips/{}".format(Twitch_Username), clip, "{} - {} - {}".format(str(clip['node']['viewCount']), clip['node']['createdAt'].split('T')[0], clip['node']['title']), i)
             i = i + 1
-        else:
-            doneParsing = True
     if not r.json()[0]['data']['user']['clips']['pageInfo']['hasNextPage']:
         doneParsing = True
     cursor = clips[len(clips) - 1]['cursor']
