@@ -64,7 +64,7 @@ while not doneParsing:
                 else:
                     doneParsing = True
             else:
-                DownloadClip("./top-clips/{}".format(Twitch_Username), clip, "{} - {} - {}".format(str(clip['node']['viewCount']), clip['node']['createdAt'].split('T')[0], clip['node']['title']), i)
+                DownloadClip("./top-clips/{}".format(Twitch_Username), clip['node']['slug'], "{} - {} - {}".format(str(clip['node']['viewCount']), clip['node']['createdAt'].split('T')[0], clip['node']['title']), i)
                 i = i + 1
         if not r.json()[0]['data']['user']['clips']['pageInfo']['hasNextPage']:
             doneParsing = True
