@@ -12,13 +12,14 @@ def GetClipUrl(slug):
         return None
 
 def DownloadClip(download_path, slug, filename, i):
-    filename = "{}-{}.mp4".format(str(i), slugify(filename))
+    filename = "".join([c for c in filename if c.isalpha() or c.isdigit() or c=='-']).rstrip()
+    filename = u"{}-{}.mp4".format(str(i), filename)
     clip_url = GetClipUrl(slug)
     if clip_url != None:
         r = requests.get(clip_url)
-        with open("{}/{}".format(download_path, filename), 'wb') as f:
+        with open(u"{}/{}".format(download_path, filename), 'wb') as f:
             f.write(r.content)
-        print("[SUCCESS] Saved as {}".format(filename))
+        print(u"[SUCCESS] Saved as {}".format(filename))
 
 # Create the parser
 my_parser = argparse.ArgumentParser(description='Downloads your Twitch clips')
@@ -59,12 +60,12 @@ while not doneParsing:
         for clip in clips:
             if Clips_Limit != None:
                 if i <= Clips_Limit:
-                    DownloadClip("./top-clips/{}".format(Twitch_Username), clip['node']['slug'], "{} - {} - {}".format(str(clip['node']['viewCount']), clip['node']['createdAt'].split('T')[0], clip['node']['title']), i)
+                    DownloadClip("./top-clips/{}".format(Twitch_Username), clip['node']['slug'], u"{} - {} - {}".format(str(clip['node']['viewCount']), clip['node']['createdAt'].split('T')[0], clip['node']['title']), i)
                     i = i + 1
                 else:
                     doneParsing = True
             else:
-                DownloadClip("./top-clips/{}".format(Twitch_Username), clip['node']['slug'], "{} - {} - {}".format(str(clip['node']['viewCount']), clip['node']['createdAt'].split('T')[0], clip['node']['title']), i)
+                DownloadClip("./top-clips/{}".format(Twitch_Username), clip['node']['slug'], u"{} - {} - {}".format(str(clip['node']['viewCount']), clip['node']['createdAt'].split('T')[0], clip['node']['title']), i)
                 i = i + 1
         if not r.json()[0]['data']['user']['clips']['pageInfo']['hasNextPage']:
             doneParsing = True

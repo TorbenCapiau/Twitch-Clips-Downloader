@@ -31,11 +31,12 @@ def GetCuratorId(username, auth):
 
 def DownloadClip(clip, filename, i):
     if not AlreadyDownloaded(clip['node']['slug']):
-        filename = "{}-{}.mp4".format(str(i), slugify(filename))
+        filename = "".join([c for c in filename if c.isalpha() or c.isdigit() or c=='-']).rstrip()
+        filename = u"{}-{}.mp4".format(str(i), filename)
         clip_url = GetClipUrl(clip['node']['slug'])
         if clip_url != None:
             r = requests.get(clip_url)
-            with open("{}/{}".format(download_path, filename), 'wb') as f:
+            with open(u"{}/{}".format(download_path, filename), 'wb') as f:
                 f.write(r.content)
             print("[SUCCESS] Saved as {}".format(filename))
     else:
