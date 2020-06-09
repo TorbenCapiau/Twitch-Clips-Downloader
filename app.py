@@ -39,6 +39,7 @@ def DownloadClip(clip, filename, i):
             with open(u"{}/{}".format(download_path, filename), 'wb') as f:
                 f.write(r.content)
             print("[SUCCESS] Saved as {}".format(filename))
+            MarkDone(clip['node']['slug'])
     else:
         print("[SKIPPED] Already downloaded this file ({})".format(filename))
 

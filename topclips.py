@@ -2,6 +2,16 @@ import requests, os, argparse
 from slugify import slugify
 from time import sleep
 
+def MarkDone(slug):
+    with open("done.txt", "a+") as myfile:
+        myfile.write("{}\n".format(slug))
+
+def AlreadyDownloaded(slug):
+    with open('done.txt') as myfile:
+        if slug in myfile.read():
+            return True
+    return False
+
 def GetClipUrl(slug):
     data = [{"operationName":"VideoAccessToken_Clip","variables":{"slug":slug},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"9bfcc0177bffc730bd5a5a89005869d2773480cf1738c592143b5173634b7d15"}}}]
     r = requests.post("https://gql.twitch.tv/gql", headers={"Client-Id": "kimne78kx3ncx6brgo4mv6wki5h1ko"}, json=data)
@@ -12,14 +22,18 @@ def GetClipUrl(slug):
         return None
 
 def DownloadClip(download_path, slug, filename, i):
-    filename = "".join([c for c in filename if c.isalpha() or c.isdigit() or c=='-']).rstrip()
-    filename = u"{}-{}.mp4".format(str(i), filename)
-    clip_url = GetClipUrl(slug)
-    if clip_url != None:
-        r = requests.get(clip_url)
-        with open(u"{}/{}".format(download_path, filename), 'wb') as f:
-            f.write(r.content)
-        print(u"[SUCCESS] Saved as {}".format(filename))
+    if not AlreadyDownloaded(slug):
+        filename = "".join([c for c in filename if c.isalpha() or c.isdigit() or c=='-']).rstrip()
+        filename = u"{}-{}.mp4".format(str(i), filename)
+        clip_url = GetClipUrl(slug)
+        if clip_url != None:
+            r = requests.get(clip_url)
+            with open(u"{}/{}".format(download_path, filename), 'wb') as f:
+                f.write(r.content)
+            print(u"[SUCCESS] Saved as {}".format(filename))
+            MarkDone(slug)
+    else:
+        print("[SKIPPED] Already downloaded this file ({})".format(filename))
 
 # Create the parser
 my_parser = argparse.ArgumentParser(description='Downloads your Twitch clips')
@@ -51,6 +65,7 @@ i = 1
 cursor = None
 nextPage = True
 doneParsing = False
+MarkDone("")
 while not doneParsing:
     data = [{"operationName":"ClipsCards__User","variables":{"login":Twitch_Username,"limit":20, "cursor": cursor, "criteria":{"filter":"ALL_TIME"}},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"b73ad2bfaecfd30a9e6c28fada15bd97032c83ec77a0440766a56fe0bd632777"}}}]
     r = requests.post("https://gql.twitch.tv/gql", headers={"Client-Id": "kimne78kx3ncx6brgo4mv6wki5h1ko"}, json=data)
