@@ -20,6 +20,7 @@ Many streamers have received copyright complaints over their Twitch clips and ar
 ## How to use - Download top clips of a channel
 1. Get channelname (twitch.tv/<channelName>)
 2. Run `topclips.py` as seen below
+NOTE: If no `--limit` is given, this tool will download up to 1k clips for each filter (ALL_TIME, LAST_DAY, LAST_WEEK, LAST_MONTH). It is not possible to download more than 1k clips per filter.
 
 ## Installation & usage
 ```bash
