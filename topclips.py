@@ -23,7 +23,7 @@ def GetClipUrl(slug):
 
 def DownloadClip(download_path, slug, filename, i):
     if not AlreadyDownloaded(slug):
-        filename = "".join([c for c in filename if c.isalpha() or c.isdigit() or c=='-']).rstrip()
+        filename = "".join([c for c in filename if c.isalpha() or c.isdigit() or c=='-' or c==' ']).rstrip()
         filename = u"{}-{}.mp4".format(str(i), filename)
         clip_url = GetClipUrl(slug)
         if clip_url != None:

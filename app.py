@@ -31,7 +31,7 @@ def GetCuratorId(username, auth):
 
 def DownloadClip(clip, filename, i):
     if not AlreadyDownloaded(clip['node']['slug']):
-        filename = "".join([c for c in filename if c.isalpha() or c.isdigit() or c=='-']).rstrip()
+        filename = "".join([c for c in filename if c.isalpha() or c.isdigit() or c=='-' or c==' ']).rstrip()
         filename = u"{}-{}.mp4".format(str(i), filename)
         clip_url = GetClipUrl(clip['node']['slug'])
         if clip_url != None:
