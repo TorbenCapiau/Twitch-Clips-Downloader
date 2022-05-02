@@ -19,7 +19,8 @@ def GetClipUrl(slug):
     data = [{"operationName":"VideoAccessToken_Clip","variables":{"slug":slug},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"9bfcc0177bffc730bd5a5a89005869d2773480cf1738c592143b5173634b7d15"}}}]
     r = requests.post("https://gql.twitch.tv/gql", headers={"Client-Id": "kimne78kx3ncx6brgo4mv6wki5h1ko"}, json=data)
     try:
-        return r.json()[0]['data']['clip']['videoQualities'][0]['sourceURL']
+        url = r.json()[0]['data']['clip']['videoQualities'][0]['sourceURL']
+        return url.replace("https://production.assets.clips.twitchcdn.net/", "https://clips-media-assets2.twitch.tv/")
     except:
         print("[ERROR] Could not fetch clip URL")
         return None
